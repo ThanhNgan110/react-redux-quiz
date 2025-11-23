@@ -1,12 +1,14 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
+import type { RootState } from "../../store";
 
 function FinalScore() {
   const navigate = useNavigate();
+  const score = useSelector((state: RootState) => state.question.score)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     navigate('/leader-board')
   }
 
@@ -14,7 +16,7 @@ function FinalScore() {
     <>
       <Box>
         <Typography variant="h4" align="center">
-          Final Score
+          Final Score: {score}
         </Typography>
       </Box>
 

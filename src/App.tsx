@@ -1,7 +1,6 @@
 import {
   createBrowserRouter,
   Navigate,
-  Outlet,
   RouterProvider,
 } from "react-router";
 import Dashboard from './pages/dashboard';
@@ -9,6 +8,8 @@ import Question from "./pages/question/question";
 import Leaderboard from "./pages/leaderboard";
 import FinalScore from "./pages/final-score";
 import Template1 from "./components/template/template1";
+import { useSelector } from "react-redux";
+import type { RootState } from "./store";
 
 
 // function Root() {
@@ -21,6 +22,9 @@ import Template1 from "./components/template/template1";
 // }
 
 function App() {
+  const state = useSelector((state: RootState) => state)
+
+  console.log("App: ", state)
 
   const router = createBrowserRouter([
     {
