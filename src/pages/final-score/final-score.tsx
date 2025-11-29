@@ -1,14 +1,23 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import type { RootState } from "../../store";
+import { updateMember } from "../../slices/leaderboard.slice";
 
 function FinalScore() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const score = useSelector((state: RootState) => state.question.score)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const bodyData = {
+      firstName: 'tony' + Math.floor(Math.random() * 4) + Date.now(),
+      lastName: 'tony' + Math.floor(Math.random() * 4) + Date.now(),
+      email: 'tony' + Math.floor(Math.random() * 4) + Date.now() + '@gmail.com',
+      score
+    }
+    dispatch(updateMember(bodyData));
     navigate('/leader-board')
   }
 

@@ -6,6 +6,8 @@ import { decode } from 'html-entities';
 import type { RootState } from "../../store";
 import type { IQuestion } from "../../types";
 import { updateScore } from '../../slices/question.slice';
+import { DIFFICULTY_TIME } from "../../configs";
+import { formatTimer } from "../../utils/formatTimer";
 
 
 // https://opentdb.com/api.php?amount=5&category=11&difficulty=medium&type=boolean
@@ -14,15 +16,16 @@ function Question() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const formQuestion = useSelector((state: RootState) => state.question.form);
+  const { category, amount, type, difficulty } = formQuestion;
+
   const score = useSelector((state: RootState) => state.question.score);
 
   const [questions, setQuestions] = React.useState<IQuestion[]>([]);
   const [questionIndex, setQuestionIndex] = React.useState(0);
   const [options, setOptions] = React.useState<string[]>([]);
+  const [countTime, setCountTime] = React.useState(DIFFICULTY_TIME[difficulty || 'easy'])
 
   React.useEffect(() => {
-    const { category, amount, type, difficulty } = formQuestion;
-
     if(!category || !amount || !type || !difficulty) {
       return;
     }
@@ -45,8 +48,7 @@ function Question() {
       } catch(err) {}
     }
     fetchQuestion();
-  }, [formQuestion]);
-
+  }, [category, amount, type, difficulty]);
 
   // handle answer of next question
   React.useEffect(() => {
@@ -61,9 +63,28 @@ function Question() {
       questionItem.correct_answer
     )
     setOptions(dataOptions);
-  }, [questionIndex])
+  }, [questionIndex]);
 
-  console.log('questions: ', questions)
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCountTime(prevState => {
+        if (prevState > 0) {
+          return prevState - 1
+        }
+
+        // ['a','b','c','d'], 0-3, options[3]
+        const randomConent = options[Math.floor(Math.random() * 4)];
+        
+        handleAnswer(randomConent);
+        return DIFFICULTY_TIME[difficulty || 'easy']
+      })
+    }, 1000);
+
+    return () => {
+      clearInterval(timer)
+    }
+  }, [options])
+
 
   function handleAnswer(content: string) {
     const correct_answer = questions[questionIndex].correct_answer;
@@ -85,6 +106,10 @@ function Question() {
   function gotoDashboard() {
     navigate('/')
   }
+
+  console.log('question: ', {
+    questionIndex
+  })
 
   return (
     <>
@@ -132,8 +157,8 @@ function Question() {
               Score: {score}/{questions.length}
             </Typography>
 
-            <Typography variant="body1" align="center">
-              Timer: 0:30
+            <Typography variant="body1" align="center" sx={{ color: countTime < 10 ? 'red' : ''}}>
+              Timer: {formatTimer(countTime)}
             </Typography>
           </Box>
         </>
